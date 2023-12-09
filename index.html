@@ -21,7 +21,8 @@
       <input type="text" id="keyword" placeholder="Enter keyword" required />
       <button type="submit">Get Data</button>
     </form>
-    <div id="result"></div>
+    <h2>Results</h2>
+    <div id="result" style="margin-top: 100px; width: 400px"></div>
     <div id="statusBox">
       <h3>Status:</h3>
       <div id="mapReduceManualIndexingDone">Manual Indexing Done:</div>
@@ -55,9 +56,11 @@
               );
             }
 
-            const data = await response.text(); // Handle response as text
-            console.log(data);
-            resultElement.textContent = data;
+            const dataString = await response.text(); // Handle response as text
+            const data = JSON.parse(dataString);
+            console.log(data, typeof data);
+            resultElement.innerHTML = ""; // Clear previous results
+            resultElement.appendChild(createTable(data));
           } catch (error) {
             console.error(
               "There was a problem retrieving the Redis data:",
@@ -66,6 +69,44 @@
             resultElement.textContent = `Error retrieving data: ${error.message}`;
           }
         });
+      function createTable(data) {
+        // Check if data and data.filenames exist and is an object
+        console.log(typeof data);
+        if (!data || !data.filenames || typeof data.filenames !== "object") {
+          const errorText = document.createTextNode("No valid data found.");
+          return errorText;
+        }
+
+        const table = document.createElement("table");
+        table.style.borderCollapse = "collapse";
+        table.style.width = "100%";
+
+        const headerRow = table.insertRow();
+        headerRow.style.borderBottom = "1px solid #ddd";
+
+        const headerFilename = headerRow.insertCell();
+        headerFilename.textContent = "Filename";
+        headerFilename.style.fontWeight = "bold";
+
+        const headerCount = headerRow.insertCell();
+        headerCount.textContent = "Count";
+        headerCount.style.fontWeight = "bold";
+
+        // Add data to the table
+        for (const [filename, count] of Object.entries(data.filenames)) {
+          const row = table.insertRow();
+          row.style.borderBottom = "1px solid #ddd";
+
+          const cellFilename = row.insertCell();
+          cellFilename.textContent = filename;
+
+          const cellCount = row.insertCell();
+          cellCount.textContent = count;
+        }
+
+        return table;
+      }
+
       function fetchWord(keyword) {
         fetch(
           "https://us-central1-nikhil-srirangam-fall2023.cloudfunctions.net/fetchFrontendStatus",
@@ -97,7 +138,7 @@
               const resultElement = document.getElementById(
                 "mapReduceProcessing"
               );
-              resultElement.textContent += data;
+              //   resultElement.textContent += data;
             }
           })
           .catch((error) => {
