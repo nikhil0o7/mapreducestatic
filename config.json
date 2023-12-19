@@ -1,0 +1,18 @@
+{
+  "kv_store": {
+    "IP": "127.0.0.1",
+    "PORT": 8000
+  },
+  "master": {
+    "IP": "127.0.0.1",
+    "PORT": 8001
+  },
+  "mappers": 5,
+  "reducers": 5,
+  "input_dir": "./input",
+  "input_file1": "./input/pg84.txt",
+  "input_file2": "./input/pg100.txt",
+  "input_file3": "./input/pg1342.txt",
+  "map_reduce_fn": "inverted_index.py",
+  "application": "inverted_index"
+}
